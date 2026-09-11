@@ -1,11 +1,74 @@
 <!doctype html>
 <html lang="th">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Dashboard ฝ่ายบริหารงานกิจการนักเรียน 2569</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root{--bg:#f4f7fb;--card:#fff;--ink:#172033;--muted:#6b7280;--line:#e6ebf2;--navy:#0f172a;--blue:#2563eb}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:linear-gradient(135deg,#eef4ff,#f8fafc);color:var(--ink)}.wrap{max-width:1400px;margin:auto;padding:28px}.hero{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;border-radius:24px;padding:28px 30px;box-shadow:0 18px 45px #0f172a2e}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.title{font-size:30px;font-weight:800}.sub{opacity:.85;margin-top:6px;font-size:15px}.controls{display:flex;gap:12px;align-items:center;margin-top:22px;flex-wrap:wrap}.select{background:#fff;color:#111827;border:0;border-radius:12px;padding:11px 15px;font-weight:700;min-width:180px}.badge,.btn{background:#ffffff1a;border:1px solid #ffffff40;color:#fff;border-radius:10px;padding:9px 13px;font-weight:700}.btn{cursor:pointer}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px #0f172a0d}.kpi{display:flex;justify-content:space-between}.label{font-size:13px;color:var(--muted);line-height:1.45}.value{font-size:31px;font-weight:800;margin-top:8px}.icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#eff6ff}.section{margin-top:22px}.section-title{font-size:18px;font-weight:800;margin:0 0 12px}.charts{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}.chartbox{height:390px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:11px 9px;border-bottom:1px solid var(--line);font-size:13px}.table th{text-align:left;background:#f8fafc;color:#475569}.num{text-align:right;font-weight:700}.risk{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}.high{background:#fee2e2;color:#b91c1c}.mid{background:#fef3c7;color:#92400e}.low{background:#dcfce7;color:#166534}.footer{text-align:center;color:var(--muted);font-size:12px;margin:20px}.status{margin-left:auto;font-size:12px;opacity:.8}@media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}}@media(max-width:650px){.wrap{padding:14px}.grid{grid-template-columns:1fr}.title{font-size:23px}.hero{padding:22px}}
-</style></head><body><div class="wrap"><section class="hero"><div class="toolbar"><div><div class="title">Dashboard ฝ่ายบริหารงานกิจการนักเรียน</div><div class="sub">สรุปข้อมูลวินัย • การมาเรียน • การดูแลช่วยเหลือนักเรียน • มาตรการทางวินัย | ปีการศึกษา 2569</div></div><button class="btn" onclick="window.print()">พิมพ์ / PDF</button></div><div class="controls"><select id="term" class="select"><option value="1">ภาคเรียนที่ 1/2569</option><option value="2">ภาคเรียนที่ 2/2569</option></select><span class="badge">เลือกภาคเรียนเพื่อดูข้อมูล</span><span class="status">ระบบพร้อมใช้งาน</span></div></section><section class="grid" id="kpis"></section><section class="section"><div class="charts"><div class="card chartbox"><div class="section-title">ภาพรวมเหตุการณ์และพฤติกรรม</div><canvas id="barChart"></canvas></div><div class="card chartbox"><div class="section-title">มาตรการทางวินัย</div><canvas id="doughnutChart"></canvas></div></div></section><section class="section card"><div class="toolbar"><div class="section-title">รายละเอียดตัวชี้วัด</div><div style="color:#64748b;font-size:12px">ข้อมูลเริ่มต้นเป็น 0 — สามารถนำไปเชื่อมกับข้อมูลจริงภายหลัง</div></div><div style="overflow:auto"><table class="table"><thead><tr><th>ตัวชี้วัด</th><th class="num">จำนวน</th><th>สถานะ</th></tr></thead><tbody id="detail"></tbody></table></div></section><div class="footer">Dashboard ฝ่ายบริหารงานกิจการนักเรียน • ปีการศึกษา 2569</div></div><script>
-const labels=['นักเรียนสูบบุหรี่','นักเรียนสูบบุหรี่ไฟฟ้า','ทะเลาะวิวาท','หนีเรียน','มาสาย 8.00–8.20','มาสาย 8.20 เป็นต้นไป','นักเรียนคะแนนติดลบ -100 ขึ้นไป','นักเรียนคะแนนติดลบ -200 ขึ้นไป','นักเรียนซึมเศร้า','นักเรียนเข้ารับการบำบัดซึมเศร้า','การแจ้งเชิญผู้ปกครองพบ','นักเรียนโดนหนังสือตักเตือน ครั้งที่ 1','นักเรียนโดนหนังสือตักเตือน ครั้งที่ 2','นักเรียนโดนหนังสือตักเตือน ครั้งที่ 3','นักเรียนโดนพักการเรียน','นักเรียนโดนย้ายสถานศึกษา'];const data={1:{},2:{}};labels.forEach(k=>{data[1][k]=0;data[2][k]=0});let bar,dough;const icons=['🚬','💨','⚠️','🏃','⏰','⏱️','📉','📉','🧠','🩺','👨‍👩‍👧','1️⃣','2️⃣','3️⃣','⛔','🏫'];function risk(v){return v>=20?['สูง','high']:v>=5?['เฝ้าระวัง','mid']:['ปกติ','low']}function draw(t){let d=data[t];let k=[labels[0],labels[1],labels[2],labels[3],labels[4],labels[5],labels[8],labels[10]];document.getElementById('kpis').innerHTML=k.map((x,i)=>`<div class="card kpi"><div><div class="label">${x}</div><div class="value">${d[x]}</div></div><div class="icon">${icons[i]}</div></div>`).join('');if(bar)bar.destroy();if(dough)dough.destroy();bar=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:labels.slice(0,10),datasets:[{label:'จำนวน',data:labels.slice(0,10).map(x=>d[x]),borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}}}}});dough=new Chart(document.getElementById('doughnutChart'),{type:'doughnut',data:{labels:labels.slice(10),datasets:[{data:labels.slice(10).map(x=>d[x])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});document.getElementById('detail').innerHTML=labels.map(x=>{let r=risk(d[x]);return `<tr><td>${x}</td><td class="num">${d[x].toLocaleString('th-TH')}</td><td><span class="risk ${r[1]}">${r[0]}</span></td></tr>`}).join('')}document.getElementById('term').onchange=e=>draw(e.target.value);draw('1');
-</script></body></html>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#172033;--muted:#6b7280;--line:#e6ebf2;--navy:#0f172a;--blue:#2563eb;--violet:#7c3aed;--red:#dc2626;--amber:#d97706;--green:#059669;--teal:#0f766e;}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:linear-gradient(135deg,#eef4ff,#f8fafc);color:var(--ink)}
+.wrap{max-width:1400px;margin:auto;padding:28px}
+.hero{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;border-radius:24px;padding:28px 30px;box-shadow:0 18px 45px rgba(15,23,42,.18);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-100px;top:-120px;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.08)}
+.title{font-size:30px;font-weight:800;letter-spacing:.2px}.sub{opacity:.85;margin-top:6px;font-size:15px}
+.controls{display:flex;gap:12px;align-items:center;margin-top:22px;flex-wrap:wrap}.select{appearance:none;background:#fff;color:#111827;border:0;border-radius:12px;padding:11px 15px;font-weight:700;box-shadow:0 5px 20px rgba(0,0,0,.12);min-width:170px}.badge{background:rgba(255,255,255,.15);padding:9px 13px;border-radius:999px;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(15,23,42,.05)}
+.kpi{display:flex;justify-content:space-between;gap:10px}.kpi .label{font-size:13px;color:var(--muted);line-height:1.45}.kpi .value{font-size:31px;font-weight:800;margin-top:8px}.icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:19px;font-weight:800;background:#eff6ff;color:var(--blue)}
+.section{margin-top:22px}.section-title{font-size:18px;font-weight:800;margin:0 0 12px}.charts{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}.chartbox{height:390px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:11px 9px;border-bottom:1px solid var(--line);font-size:13px}.table th{color:#475569;text-align:left;background:#f8fafc}.num{text-align:right;font-weight:700}.risk{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}.high{background:#fee2e2;color:#b91c1c}.mid{background:#fef3c7;color:#92400e}.low{background:#dcfce7;color:#166534}
+.footer{margin:20px 0 4px;color:var(--muted);font-size:12px;text-align:center}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.btn{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;border-radius:10px;padding:9px 12px;cursor:pointer;font-weight:700}.btn:hover{background:rgba(255,255,255,.16)}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.chartbox{height:360px}}@media(max-width:650px){.wrap{padding:14px}.grid{grid-template-columns:1fr}.title{font-size:23px}.hero{padding:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+  <div class="toolbar"><div><div class="title">Dashboard ฝ่ายบริหารงานกิจการนักเรียน</div><div class="sub">สรุปข้อมูลวินัย ความปลอดภัย การดูแลช่วยเหลือนักเรียน และมาตรการทางวินัย • ปีการศึกษา 2569</div></div><div><button class="btn" onclick="window.print()">พิมพ์ / PDF</button></div></div>
+  <div class="controls"><select id="term" class="select"><option value="1">ภาคเรียนที่ 1/2569</option><option value="2">ภาคเรียนที่ 2/2569</option></select><span class="badge">อัปเดตจากข้อมูลจริง • เลือกภาคเรียนเพื่อดูตัวเลข</span></div>
+</section>
+
+<section class="grid" id="kpis"></section>
+
+<section class="section">
+  <div class="charts">
+    <div class="card chartbox"><div class="section-title">ภาพรวมเหตุการณ์และพฤติกรรม</div><canvas id="barChart"></canvas></div>
+    <div class="card chartbox"><div class="section-title">มาตรการทางวินัย</div><canvas id="doughnutChart"></canvas></div>
+  </div>
+</section>
+
+<section class="section card">
+  <div class="toolbar"><div class="section-title" style="margin:0">รายละเอียดตัวชี้วัด</div><div style="color:#64748b;font-size:12px">เลือกภาคเรียนด้านบนเพื่อสลับข้อมูล</div></div>
+  <div style="overflow:auto;margin-top:8px"><table class="table"><thead><tr><th>ตัวชี้วัด</th><th class="num">จำนวน</th><th>ระดับเฝ้าระวัง*</th></tr></thead><tbody id="detail"></tbody></table></div>
+</section>
+<div id="sourceNote" style="margin-top:10px;text-align:right;color:#64748b;font-size:12px"></div>
+<div class="footer">* ระดับเฝ้าระวังเป็นเพียงการจัดกลุ่มเพื่อช่วยมองภาพรวม ไม่ใช่เกณฑ์ทางราชการ</div>
+</div>
+<script>
+const labels=[
+['นักเรียนสูบบุหรี่','พฤติกรรม'],['นักเรียนสูบบุหรี่ไฟฟ้า','พฤติกรรม'],['ทะเลาะวิวาท','พฤติกรรม'],['หนีเรียน','การมาเรียน'],
+['มาสาย 8.00–8.20','การมาเรียน'],['มาสาย 8.20 เป็นต้นไป','การมาเรียน'],['นักเรียนคะแนนติดลบ -100 ขึ้นไป','คะแนนความประพฤติ'],['นักเรียนคะแนนติดลบ -200 ขึ้นไป','คะแนนความประพฤติ'],
+['นักเรียนซึมเศร้า','การดูแลช่วยเหลือ'],['นักเรียนเข้ารับการบำบัดซึมเศร้า','การดูแลช่วยเหลือ'],['การแจ้งเชิญผู้ปกครองพบ','มาตรการ'],['หนังสือตักเตือน ครั้งที่ 1','มาตรการ'],['หนังสือตักเตือน ครั้งที่ 2','มาตรการ'],['หนังสือตักเตือน ครั้งที่ 3','มาตรการ'],['นักเรียนโดนพักการเรียน','มาตรการ'],['นักเรียนโดนย้ายสถานศึกษา','มาตรการ']
+];
+const data={
+1:{'นักเรียนสูบบุหรี่':12,'นักเรียนสูบบุหรี่ไฟฟ้า':10,'ทะเลาะวิวาท':0,'หนีเรียน':0,'มาสาย 8.00–8.20':52,'มาสาย 8.20 เป็นต้นไป':63,'นักเรียนคะแนนติดลบ -100 ขึ้นไป':66,'นักเรียนคะแนนติดลบ -200 ขึ้นไป':27,'นักเรียนซึมเศร้า':0,'นักเรียนเข้ารับการบำบัดซึมเศร้า':0,'การแจ้งเชิญผู้ปกครองพบ':0,'หนังสือตักเตือน ครั้งที่ 1':0,'หนังสือตักเตือน ครั้งที่ 2':0,'หนังสือตักเตือน ครั้งที่ 3':0,'นักเรียนโดนพักการเรียน':0,'นักเรียนโดนย้ายสถานศึกษา':0},
+2:{'นักเรียนสูบบุหรี่':0,'นักเรียนสูบบุหรี่ไฟฟ้า':0,'ทะเลาะวิวาท':0,'หนีเรียน':0,'มาสาย 8.00–8.20':0,'มาสาย 8.20 เป็นต้นไป':0,'นักเรียนคะแนนติดลบ -100 ขึ้นไป':0,'นักเรียนคะแนนติดลบ -200 ขึ้นไป':0,'นักเรียนซึมเศร้า':0,'นักเรียนเข้ารับการบำบัดซึมเศร้า':0,'การแจ้งเชิญผู้ปกครองพบ':0,'หนังสือตักเตือน ครั้งที่ 1':0,'หนังสือตักเตือน ครั้งที่ 2':0,'หนังสือตักเตือน ครั้งที่ 3':0,'นักเรียนโดนพักการเรียน':0,'นักเรียนโดนย้ายสถานศึกษา':0}
+};
+let bar,dough;
+function risk(v){return v>=20?['สูง','high']:v>=5?['เฝ้าระวัง','mid']:['ปกติ','low']}
+function draw(term){
+ const d=data[term];
+ const kpiMap=[labels[0][0],labels[1][0],labels[2][0],labels[3][0],labels[4][0],labels[5][0],labels[8][0],labels[10][0]];
+ const icons=['🚬','💨','⚠️','🏃','⏰','⏱️','🧠','👨‍👩‍👧'];
+ document.getElementById('kpis').innerHTML=kpiMap.map((k,i)=>`<div class="card kpi"><div><div class="label">${k}</div><div class="value">${d[k]}</div></div><div class="icon">${icons[i]}</div></div>`).join('');
+ const barLabels=labels.slice(0,10).map(x=>x[0].replace('นักเรียน','').trim());
+ const barVals=labels.slice(0,10).map(x=>d[x[0]]);
+ if(bar)bar.destroy(); if(dough)dough.destroy();
+ bar=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:barLabels,datasets:[{label:'จำนวน',data:barVals,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}}}}});
+ const mlabels=labels.slice(10).map(x=>x[0].replace('นักเรียน','').trim()); const mvals=labels.slice(10).map(x=>d[x[0]]);
+ dough=new Chart(document.getElementById('doughnutChart'),{type:'doughnut',data:{labels:mlabels,datasets:[{data:mvals}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+ document.getElementById('detail').innerHTML=labels.map(x=>{const [r,c]=risk(d[x[0]]);return `<tr><td>${x[0]}</td><td class="num">${d[x[0]].toLocaleString('th-TH')}</td><td><span class="risk ${c}">${r}</span></td></tr>`}).join('');
+ document.getElementById('sourceNote').innerHTML = term==='1' ? 'อัปเดตจาก 3 ไฟล์: รายชื่อเด็กสูบบุหรี่.xlsx • 07.09.2569 คะแนนพฤติกรรม.xlsx • มาสายเกิน 3 ครั้ง.xlsx | มาสาย 8.00/8.30 น. นับนักเรียนไม่ซ้ำจาก มิ.ย.–ส.ค. | พ.ค.ไม่มีคอลัมน์เวลา' : 'ภาคเรียนที่ 2/2569: รอข้อมูลจริง';
+}
+document.getElementById('term').addEventListener('change',e=>draw(e.target.value));draw('1');
+</script>
+</body></html>
